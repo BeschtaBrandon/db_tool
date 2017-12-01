@@ -1,0 +1,17 @@
+#fileUpload {
+position: relative; /* has to be position relative for left to work, or you could just do margin-left: -50px; too */
+left: -35px;
+}
+
+
+#resetButton, #submitButton {
+	padding-top: 15px;
+	display: inline-block;
+}
+
+#resetButton {
+	padding-left: 35px;
+}
+#submitButton {
+	padding-right: 35px;
+}

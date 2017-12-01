@@ -1,0 +1,38 @@
+<project name="AutoDbService CI Deploy" default="fulldeploy" basedir=".">
+  <property environment="env" />
+  <property file="deploy.properties"/>
+
+  <!-- Must pass deploy_version in from the UI. -->
+  <property name="numeric_deploy_version" value="" />
+
+  <taskdef resource="net/sf/antcontrib/antlib.xml">
+    <classpath>
+      <fileset dir="${env.buildextensionroot}/AntContrib">
+        <include name="**/*.jar" />
+      </fileset>
+    </classpath>
+  </taskdef>
+  <!-- This does all the work for deployment. -->
+  <target name="fulldeploy" description="this does the full deploy of the verical">
+
+    <if>
+      <isset property="SharedScriptExt" />
+      <then>
+        <echo message="Executing Shared delpoyment part" />
+        <sshexec host="${DEPLOY_SERVER}"
+                     username="${CURRENT_USER}"
+                     password="${CURRENT_PASSWORD}"
+                     trust="yes"
+                     command="cd /appserver/deployment;./deploycidr${SharedScriptExt} ${numeric_deploy_version} application=${APPLICATION} username=${NODE_AGENT_USER} password=${NODE_AGENT_PASSWORD}"/>
+      </then>
+      <else>
+        <sshexec host="${DEPLOY_SERVER}"
+                     username="${CURRENT_USER}"
+                     password="${CURRENT_PASSWORD}"
+                     trust="yes"
+                     command="cd /appserver/deployment;./deploycidr${SharedScriptExt} ${numeric_deploy_version} application=${APPLICATION} username=${NODE_AGENT_USER} password=${NODE_AGENT_PASSWORD};cd /tools/mtt/infra/release/${APPLICATION};mkdir ${numeric_deploy_version}"/>
+
+      </else>
+    </if>
+  </target>
+</project>

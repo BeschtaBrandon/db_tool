@@ -1,0 +1,107 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.6.RELEASE'
+		flywayVersion = '4.2.0'
+	}
+	repositories {
+		mavenCentral()
+		maven {
+			url("http://cobaltdm.int.thomsonreuters.com:9001/nexus-webapps/content/repositories/3rdpartycache/")
+		}
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("org.flywaydb:flyway-gradle-plugin:${flywayVersion}")
+		classpath("com.oracle:ojdbc7:12.1.0.2_patched")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'maven'
+apply plugin: 'org.flywaydb.flyway'
+
+group = 'com.thomsonreuters.cm.AutoDbService'
+version = '1.0.0'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+	maven {
+			url("http://cobaltdm.int.thomsonreuters.com:9001/nexus-webapps/content/repositories/3rdpartycache/")
+	}
+}
+
+
+dependencies {
+	compile("org.springframework.boot:spring-boot-starter-web") {
+        exclude module: "spring-boot-starter-tomcat"
+    }
+    compile("org.springframework.boot:spring-boot-starter-jetty")
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter")
+	compile("org.flywaydb:flyway-core:4.2.0")
+	compile("org.flywaydb:flyway-gradle-plugin:4.2.0")
+	compile("com.oracle:ojdbc7:12.1.0.2_patched")
+	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+	compile group: 'commons-io', name: 'commons-io', version: '2.5'
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+configurations {
+  compile.exclude module: 'spring-boot-starter-tomcat'
+  compile.exclude group: 'org.apache.tomcat'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.thomsonreuters.cm.AutoDbService.AutoDbServiceApplication'
+    }
+    baseName = project.name
+    from sourceSets.main.output
+}
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
+task setFlywayCredentials {
+	doLast {
+	    Properties props = new Properties()
+		String appPropsFileName = System.getProperty("applicationProperties")
+		String dbMacro = System.getProperty("dbMacro")
+		File appPropsFile = file(appPropsFileName)
+		appPropsFile.withInputStream {
+			props.load(it)
+		}
+		if (!dbMacro.isEmpty()) {
+			ext.flywayURL = props."${dbMacro}.jdbc.url"
+			ext.flywayUsername = props."${dbMacro}.jdbc.username"
+			ext.flywayPassword = props."${dbMacro}.jdbc.password"
+		}
+	}
+}
+
+task configureFlyway {
+	doLast{
+		flyway {
+			url = setFlywayCredentials.flywayURL
+			user = setFlywayCredentials.flywayUsername
+			password = setFlywayCredentials.flywayPassword
+		}
+	}
+}
+
+tasks.configureFlyway.dependsOn(setFlywayCredentials)
+tasks.flywayInfo.dependsOn(configureFlyway)
+tasks.flywayClean.dependsOn(configureFlyway)
+tasks.flywayBaseline.dependsOn(configureFlyway)
+tasks.flywayRepair.dependsOn(configureFlyway)
