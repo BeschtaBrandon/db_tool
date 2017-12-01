@@ -21,11 +21,11 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Provide the following:<br/>Property file, sql script, and a database macro</h1>
+          <h1 className="App-title">Perform database migration by providing the following:<br/>Property file, sql script, and a database macro</h1>
         </header>
 			<FileForm/>
 		<footer>
-			<p>&copy; 2017 Thomson Reuters.</p>
+			<p>&copy; 2017 Brandon Beschta</p>
 		</footer>
       </div>
 	  </MuiThemeProvider>
