@@ -1,14 +1,12 @@
 <body style="padding-left: 15px;">
 <h2>Database migration tool</h2>
 <p>db_tool is a Java SpringBoot application that drives the database migration process.<br>
-It reads the migration scripts from AutoDbSchema and drives Flyway to perform the migration.</p>
 
 <h4>What you'll need</h4>
 <ul>
   <li>Eclipse, IntelliJ, or Visual Studio (IntelliJ instructions can be found at <a href="https://thehub.thomsonreuters.com/docs/DOC-1601762">https://thehub.thomsonreuters.com/docs/DOC-1601762</a></li>
   <li>Gradle</li>
   <li>Gradle plugin for Eclipse</li>
-  <li>Git: <a href="https://git-scm.com/">https://git-scm.com/</a></li>
 </ul>
 
 <h4>Install Gradle</h4>
